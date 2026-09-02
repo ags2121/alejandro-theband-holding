@@ -73,3 +73,12 @@ iframe {
   margin-block-start: 2em;
   margin-block-end: 2em;
 }
+
+/* pull the cover up toward the wordmark (sibling margins collapse, so trim both) */
+main > .space:first-child {
+  margin-block-start: 0.5em;
+  margin-block-end: 0.75em;
+}
+main > .space:first-child + .space {
+  margin-block-start: 0.75em;
+}
