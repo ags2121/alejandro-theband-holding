@@ -15,12 +15,18 @@ The holding repo is a clean, history-free copy of `index.html` (wordmark only),
 ## Status
 
 - [x] Holding repo created, public, Pages enabled from `main`, build green.
-- [ ] **Porkbun DNS** — still on the parked-domain records. Do this next (below).
-- [ ] TLS cert for the custom domain — auto-issues once DNS points at GitHub.
-- [ ] Enforce HTTPS on the holding repo once the cert is live.
+- [x] Porkbun DNS — apex A records + `www` CNAME live, verified propagated.
+- [x] TLS cert for the custom domain — issued (expires 2026-12-10). Took ~12h
+      to auto-issue; GitHub's automation stalled and needed a manual nudge
+      (clear + re-add the custom domain in Pages settings, or via API) to
+      actually kick off issuance — if it stalls again next time, do that first.
+- [x] HTTPS enforced on the holding repo.
 - [ ] Oct 20 cutover (below).
 
-## Step 1 — Porkbun DNS (do anytime; site stays a holding page until Oct 20)
+`https://alejandrotheband.com` is live now, serving the wordmark-only holding
+page.
+
+## Step 1 — Porkbun DNS ✅ done
 
 Porkbun dashboard for `alejandrotheband.com` → **DNS Records**:
 
@@ -36,12 +42,26 @@ Porkbun dashboard for `alejandrotheband.com` → **DNS Records**:
 Propagation is minutes to a few hours. GitHub then auto-verifies the domain and
 issues the Let's Encrypt cert.
 
-## Step 2 — once the cert is live
-
-Check `https://alejandrotheband.com` loads the wordmark with a valid cert, then:
+## Step 2 — enforce HTTPS ✅ done
 
 ```sh
 gh api repos/ags2121/alejandro-theband-holding/pages -X PUT -F https_enforced=true
+```
+
+If the cert stalls (mine sat at GitHub's generic `*.github.io` cert for ~12h
+with no progress), don't just wait — clear and re-add the custom domain to
+force a fresh issuance:
+
+```sh
+gh api repos/ags2121/alejandro-theband-holding/pages -X PUT -F 'cname='
+gh api repos/ags2121/alejandro-theband-holding/pages -X PUT -F 'cname=alejandrotheband.com'
+```
+
+This commits `CNAME` deletion/re-creation to the repo (harmless) and can leave
+a stray "Page build failed" — an empty commit + push clears it:
+
+```sh
+git commit --allow-empty -m "trigger pages rebuild" && git push
 ```
 
 ## Step 3 — October 20 cutover (holding page → full site)
