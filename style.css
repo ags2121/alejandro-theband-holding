@@ -1,0 +1,80 @@
+/* palette sampled from the ¡Con Gusto! artwork:
+   ink    — title-image background (#252525, nudged lighter so the wordmark jpg blends in)
+   cream  — the hand lettering / cover border
+   amber  — the mahogany door light
+   flor   — the anthurium red */
+:root {
+  --ink: #272525;
+  --cream: #f0e8d8;
+  --amber: #c98b45;
+  --flor: #cf4a2c;
+}
+
+html, body {
+  margin: 0;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: "Courier Prime", "Courier New", monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 1em 16px 3em;
+}
+
+a {
+  color: var(--amber);
+  transition: color 150ms;
+}
+
+a:hover {
+  color: var(--flor);
+}
+
+:focus-visible {
+  outline: 2px solid var(--flor);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--flor);
+  color: var(--cream);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* the hand-lettered wordmark floats straight on the page:
+   lighten-blend swallows the jpg's dark ground against --ink */
+.wordmark {
+  mix-blend-mode: lighten;
+}
+
+iframe {
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  margin-block-start: 2em;
+}
+
+.space {
+  display: block;
+  margin-block-start: 2em;
+  margin-block-end: 2em;
+}
+
+/* tighter gap above the wordmark; below it keeps the default 2em .space margin */
+main > .space:first-child {
+  margin-block-start: 0.5em;
+}
