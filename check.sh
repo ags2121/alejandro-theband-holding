@@ -14,7 +14,7 @@ forbid() {
 [ -f "$f" ] || { echo "MISSING: $f"; exit 1; }
 
 require '¡Con Gusto!'
-require 'out February 5 2027'
+require 'out 5 February 2027'
 require 'https://bandcamp.com/alejandrotheband'
 require 'youtube.com/embed/ubxWFNi0-Ow'
 require 'video by jon campolo'
