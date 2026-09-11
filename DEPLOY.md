@@ -1,41 +1,73 @@
 # Deploying alejandrotheband.com
 
-The site is a plain static page served by GitHub Pages. The repo stays **private**
-(nothing published) until launch day, **October 20** — the anaheim video can't be
-public before then.
+Plain static page on GitHub Pages. Two repos, because free Pages only serves
+from a **public** repo and the `anaheim` video can't be discoverable before
+launch day, **October 20**:
 
-## Anytime before launch: Porkbun DNS
+| Repo | Visibility | Serves | When |
+| --- | --- | --- | --- |
+| [`alejandro-theband-holding`](https://github.com/ags2121/alejandro-theband-holding) | public | wordmark-only holding page | now → Oct 20 |
+| `alejandro-theband-website` (this repo) | private | the full site | Oct 20 onward |
 
-In the Porkbun dashboard for `alejandrotheband.com` → DNS Records:
+The holding repo is a clean, history-free copy of `index.html` (wordmark only),
+`style.css`, `i/title.jpg`, `CNAME`. Nothing about the video lives in it.
 
-1. **Delete** Porkbun's default parked-domain records (the preinstalled ALIAS/CNAME
-   pointing at `pixie.porkbun.com`).
-2. Add four **A** records, host blank (`alejandrotheband.com`), answers:
+## Status
+
+- [x] Holding repo created, public, Pages enabled from `main`, build green.
+- [ ] **Porkbun DNS** — still on the parked-domain records. Do this next (below).
+- [ ] TLS cert for the custom domain — auto-issues once DNS points at GitHub.
+- [ ] Enforce HTTPS on the holding repo once the cert is live.
+- [ ] Oct 20 cutover (below).
+
+## Step 1 — Porkbun DNS (do anytime; site stays a holding page until Oct 20)
+
+Porkbun dashboard for `alejandrotheband.com` → **DNS Records**:
+
+1. **Delete** the parked-domain records (the preinstalled ALIAS/CNAME pointing at
+   `*.porkbun.com` — currently resolves to `207.207.210.x`).
+2. Add four **A** records, host blank (apex), answers:
    - `185.199.108.153`
    - `185.199.109.153`
    - `185.199.110.153`
    - `185.199.111.153`
 3. Add one **CNAME** record, host `www`, answer `ags2121.github.io`.
 
-DNS can propagate ahead of time; nothing is served until Pages is enabled.
+Propagation is minutes to a few hours. GitHub then auto-verifies the domain and
+issues the Let's Encrypt cert.
 
-## On October 20: go live
+## Step 2 — once the cert is live
+
+Check `https://alejandrotheband.com` loads the wordmark with a valid cert, then:
 
 ```sh
-# 1. Make the repo public
-gh repo edit ags2121/alejandro-theband-website --visibility public --accept-visibility-change-consequences
-
-# 2. Enable GitHub Pages from main (the CNAME file in the repo sets the custom domain)
-gh api repos/ags2121/alejandro-theband-website/pages -X POST -f 'source[branch]=main' -f 'source[path]=/'
-
-# 3. Once the site is up and GitHub has issued the TLS cert (can take ~15 min), enforce HTTPS
-gh api repos/ags2121/alejandro-theband-website/pages -X PUT -F https_enforced=true
+gh api repos/ags2121/alejandro-theband-holding/pages -X PUT -F https_enforced=true
 ```
 
-Also that day: flip the anaheim video from unlisted to public on YouTube.
+## Step 3 — October 20 cutover (holding page → full site)
+
+```sh
+# 1. Free the custom domain from the holding repo (deleting the repo also does this)
+gh api repos/ags2121/alejandro-theband-holding/pages -X DELETE
+
+# 2. Make this repo public
+gh repo edit ags2121/alejandro-theband-website --visibility public --accept-visibility-change-consequences
+
+# 3. Enable Pages from main (the CNAME file in this repo re-claims the domain)
+gh api repos/ags2121/alejandro-theband-website/pages -X POST -f 'source[branch]=main' -f 'source[path]=/'
+
+# 4. After the cert re-issues (~15 min), enforce HTTPS
+gh api repos/ags2121/alejandro-theband-website/pages -X PUT -F https_enforced=true
+
+# 5. Clean up
+gh repo delete ags2121/alejandro-theband-holding --yes
+git push origin --delete holding
+```
+
+Also that day: flip the `anaheim` video from unlisted to public on YouTube.
 
 ## Leftover FIXMEs
 
-The Listen section's **youtube** and **apple music** links point at google.com with
-a visible `(FIXME)` marker until the real artist URLs exist. Edit `index.html`,
-remove the `(FIXME)` text, and push.
+The Listen section's **youtube** and **apple music** links point at google.com
+with a visible `(FIXME)` marker until the real artist URLs exist. Edit
+`index.html`, remove the `(FIXME)` text, push.
