@@ -15,7 +15,7 @@ forbid() {
 
 require '¡Con Gusto!'
 require 'out 5 February 2027'
-require 'https://bandcamp.com/alejandrotheband'
+require 'https://alejandrotheband.bandcamp.com'
 require 'youtube.com/embed/ubxWFNi0-Ow'
 require 'video by jon campolo'
 require 'anaheim'

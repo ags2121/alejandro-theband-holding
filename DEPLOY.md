@@ -21,7 +21,7 @@ The holding repo is a clean, history-free copy of `index.html` (wordmark only),
       (clear + re-add the custom domain in Pages settings, or via API) to
       actually kick off issuance — if it stalls again next time, do that first.
 - [x] HTTPS enforced on the holding repo.
-- [ ] Oct 20 cutover (below).
+- [ ] Oct 20 cutover (below): force-push this repo into the holding repo.
 
 `https://alejandrotheband.com` is live now, serving the wordmark-only holding
 page.
@@ -67,27 +67,24 @@ git commit --allow-empty -m "trigger pages rebuild" && git push
 ## Step 3 — October 20 cutover (holding page → full site)
 
 ```sh
-# 1. Free the custom domain from the holding repo (deleting the repo also does this)
-gh api repos/ags2121/alejandro-theband-holding/pages -X DELETE
+# Don't move the domain to this repo: that forces a fresh TLS cert (took ~12h
+# last time). Instead overwrite the holding repo, which already owns the domain
+# and a valid cert, with this repo's main. Zero downtime.
+git remote add holding https://github.com/ags2121/alejandro-theband-holding.git  # once
+./check.sh && git push --force holding main:main
 
-# 2. Make this repo public
-gh repo edit ags2121/alejandro-theband-website --visibility public --accept-visibility-change-consequences
+# Pages rebuilds in ~1 min. Verify:
+curl -s https://alejandrotheband.com | grep -c 'ubxWFNi0-Ow'   # expect 1
 
-# 3. Enable Pages from main (the CNAME file in this repo re-claims the domain)
-gh api repos/ags2121/alejandro-theband-website/pages -X POST -f 'source[branch]=main' -f 'source[path]=/'
-
-# 4. After the cert re-issues (~15 min), enforce HTTPS
-gh api repos/ags2121/alejandro-theband-website/pages -X PUT -F https_enforced=true
-
-# 5. Clean up
-gh repo delete ags2121/alejandro-theband-holding --yes
-git push origin --delete holding
+# From then on, publish with: git push origin main && git push holding main
+# (or rename/merge the repos later; not needed for launch)
 ```
 
 Also that day: flip the `anaheim` video from unlisted to public on YouTube.
 
 ## Leftover FIXMEs
 
-The Listen section's **youtube** and **apple music** links point at google.com
-with a visible `(FIXME)` marker until the real artist URLs exist. Edit
-`index.html`, remove the `(FIXME)` text, push.
+The Listen section's **youtube**, **apple music** and **spotify** links point at
+google.com with a visible `(FIXME)` marker until the real artist URLs exist. Edit
+`index.html`, remove the `(FIXME)` text, drop `require 'FIXME'` from
+`check.sh`, push to both remotes.
