@@ -82,9 +82,3 @@ curl -s https://alejandrotheband.com | grep -c 'ubxWFNi0-Ow'   # expect 1
 
 Also that day: flip the `anaheim` video from unlisted to public on YouTube.
 
-## Leftover FIXMEs
-
-The Listen section's **youtube**, **apple music** and **spotify** links point at
-google.com with a visible `(FIXME)` marker until the real artist URLs exist. Edit
-`index.html`, remove the `(FIXME)` text, drop `require 'FIXME'` from
-`check.sh`, push to both remotes.
