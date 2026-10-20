@@ -21,7 +21,8 @@ The holding repo is a clean, history-free copy of `index.html` (wordmark only),
       (clear + re-add the custom domain in Pages settings, or via API) to
       actually kick off issuance — if it stalls again next time, do that first.
 - [x] HTTPS enforced on the holding repo.
-- [ ] Oct 20 cutover (below): force-push this repo into the holding repo.
+- [x] Oct 20 cutover: this repo force-pushed into the holding repo; full site live.
+      Publish from now on: `git push origin main && git push holding main`.
 
 `https://alejandrotheband.com` is live now, serving the wordmark-only holding
 page.
